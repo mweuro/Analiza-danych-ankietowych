@@ -232,8 +232,24 @@ inter5
 
 ##CZĘŚĆ 3##
 binomial <- function(n, p, N){
-  smpl <- replicate(n)
-  return(smpl)
+  bin <- c()
+  for(i in 1:N){
+    U <- runif(n, min = 0, max = 1)
+    inds <- sum(U < p)
+    bin <- append(bin, inds)
+  }
+  return(bin)
+}
+
+comp_hist <- function(n, p, N){
+  # funkcja rbinom
+  df1 <- data.frame(x = c(rbinom(N, n, p), binomial(n, p, N)),
+                    group = as.factor(c(rep(1, N), rep(2, N))))
+  plt1 <- ggplot(df1, aes(x = x, fill = group)) +
+    geom_histogram(alpha = 0.5, binwidth = 1,
+                   position = 'identity')
+  plt1
+  # return(df1)
 }
 ##CZĘŚĆ 4##
 
