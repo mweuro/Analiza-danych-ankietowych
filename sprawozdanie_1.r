@@ -231,6 +231,9 @@ inter5 <- clopper1(alpha, serv)
 inter5
 
 ##CZĘŚĆ 3##
-
+binomial <- function(n, p, N){
+  smpl <- replicate(n)
+  return(smpl)
+}
 ##CZĘŚĆ 4##
 
