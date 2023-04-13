@@ -18,37 +18,37 @@ Wiek <- df$Wiek
 Wyk <- df$Wyk
 
 # zad 2
-test_zad2 <- fisher.test(P, S, conf.level = 1 - alpha, simulate.p.value = TRUE)
+x2 <- structable(P ~ S, df) %>% matrix(nrow = 2, ncol = 2)
+test_zad2 <- fisher.test(x2, conf.level = 1 - alpha, simulate.p.value = TRUE)
 test_zad2
 test_zad2$p.value
 
 # zad 3
 
 ##a
-test_zad3a <- fisher.test(S, Wiek, conf.level = 1 - alpha, simulate.p.value = TRUE)
+x3a <- structable(S ~ Wiek, df) %>% matrix(nrow = 4, ncol = 2)
+test_zad3a <- fisher.test(x3a, hybrid = TRUE, conf.level = 1 - alpha, simulate.p.value = TRUE)
 test_zad3a
 ##b
-test_zad3b <- fisher.test(S, Wyk, conf.level = 1 - alpha, simulate.p.value = TRUE)
+x3b <- structable(S ~ Wyk, df) %>% matrix(nrow = 3, ncol = 2)
+test_zad3b <- fisher.test(x3b, hybrid = TRUE, conf.level = 1 - alpha, simulate.p.value = TRUE)
 test_zad3b
 
 # zad 4
 
 ##a
-test_zad4a <- fisher.test(W1, S, conf.level = 1 - alpha, simulate.p.value = TRUE)
+x4a <- structable(W1 ~ S, df) %>% matrix(nrow = 2, ncol = 4)
+test_zad4a <- fisher.test(x4a, hybrid = TRUE, conf.level = 1 - alpha, simulate.p.value = TRUE)
 test_zad4a
 ##b
-test_zad4b <- fisher.test(W1, Wyk, conf.level = 1 - alpha, simulate.p.value = TRUE)
+x4b <- structable(W1 ~ Wyk, df) %>% matrix(nrow = 3, ncol = 4)
+test_zad4b <- fisher.test(x4b, hybrid = TRUE, conf.level = 1 - alpha, simulate.p.value = TRUE)
 test_zad4b
 ##c
-test_zad4c <- fisher.test(W1, P, conf.level = 1 - alpha, simulate.p.value = TRUE)
+x4c <- structable(W1 ~ P, df) %>% matrix(nrow = 2, ncol = 4)
+test_zad4c <- fisher.test(x4c, hybrid = TRUE, conf.level = 1 - alpha, simulate.p.value = TRUE)
 test_zad4c
 ##d
-test_zad4d <- fisher.test(W1, Wiek, conf.level = 1 - alpha, simulate.p.value = TRUE)
+x4d <- structable(W1 ~ Wiek, df) %>% matrix(nrow = 4, ncol = 4)
+test_zad4d <- fisher.test(x4d, hybrid = TRUE, conf.level = 1 - alpha, simulate.p.value = TRUE)
 test_zad4d
-
-TeaTasting <-
-  matrix(c(3, 1, 1, 3),
-         nrow = 2,
-         dimnames = list(Guess = c("Milk", "Tea"),
-                         Truth = c("Milk", "Tea")))
-fisher.test(TeaTasting, alternative = "greater")
