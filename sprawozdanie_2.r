@@ -63,8 +63,8 @@ test_zad4d
 
 # zad 5
 
-# Zapoznaæ siê z funkcj¹ 'chisq.test
-# oraz z funkcj¹ 'assocstats' 
+# Zapozna? si? z funkcj? 'chisq.test
+# oraz z funkcj? 'assocstats' 
 # biblioteki vcd.
 
 # zad 6
@@ -72,7 +72,7 @@ alpha <- 0.01
 x6 <- structable(W1 ~ S, df) %>% matrix(nrow = 2, ncol = 4)
 ### test chi-kwadrat Pearsona
 test_zad6_1 <- chisq.test(x6, rescale.p = TRUE, simulate.p.value = TRUE)
-### test chi-kwadrat ilorazu wiarogodnoœci
+### test chi-kwadrat ilorazu wiarogodno?ci
 test_zad6_2 <- assocstats(x6)
 
 # zad 7 (multinorm)
@@ -81,3 +81,33 @@ test_zad6_2 <- assocstats(x6)
 
 
 ##b
+
+
+# zad 8
+
+gk_manual <- function(df, X1, X2){
+  X1 <- data.frame(as.factor(df$X1))
+  X2 <- data.frame(as.factor(df$X2))
+  tbl <- structable(X1 ~ X2, df)
+  rows <- dim(tbl)[1]
+  cols <- dim(tbl)[2]
+  tbl <- matrix(nrow = rows, ncol = cols)
+  n <- sum(tbl)
+  
+  tau1 <- 0
+  for(row in 1:rows){
+    n_i_ <- sum(tbl[row,])
+    n_ij2 <- sum(tbl[row,]^2)
+    tau1 <- tau1 + n_ij2 / n*n_i_
+  }
+  
+  tau2 <- 0
+  for(col in 1:cols){
+    n__j <- sum(tbl[,col])
+    tau2 <- tau2 + sum((n__j / n)^2)
+    
+    tau <- (tau1 - tau2) / (1 - tau2)
+  }
+  
+  return(tbl)
+}
