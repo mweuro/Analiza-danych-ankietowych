@@ -1,5 +1,7 @@
 library(dplyr)
 library(vcdExtra)
+library(DescTools)
+
 
 # ZAD 1
 df <- read.csv('personel.csv', header = FALSE, sep = ';')
@@ -17,11 +19,13 @@ P <- df$P
 Wiek <- df$Wiek
 Wyk <- df$Wyk
 
+
 # zad 2
 x2 <- structable(P ~ S, df) %>% matrix(nrow = 2, ncol = 2)
 test_zad2 <- fisher.test(x2, conf.level = 1 - alpha, simulate.p.value = TRUE)
 test_zad2
 test_zad2$p.value
+
 
 # zad 3
 
@@ -35,6 +39,7 @@ x3b <- structable(S ~ Wyk, df) %>% matrix(nrow = 3, ncol = 2)
 test_zad3b <- fisher.test(x3b, hybrid = TRUE, 
                           conf.level = 1 - alpha, simulate.p.value = TRUE)
 test_zad3b
+
 
 # zad 4
 
@@ -59,6 +64,7 @@ test_zad4d <- fisher.test(x4d, hybrid = TRUE,
                           conf.level = 1 - alpha, simulate.p.value = TRUE)
 test_zad4d
 
+
 ###########
 
 # zad 5
@@ -66,6 +72,7 @@ test_zad4d
 # Zapozna? si? z funkcj? 'chisq.test
 # oraz z funkcj? 'assocstats' 
 # biblioteki vcd.
+
 
 # zad 6
 alpha <- 0.01
@@ -75,30 +82,74 @@ test_zad6_1 <- chisq.test(x6, rescale.p = TRUE, simulate.p.value = TRUE)
 ### test chi-kwadrat ilorazu wiarogodno?ci
 test_zad6_2 <- assocstats(x6)
 
+
 # zad 7 (multinorm)
 
-##a
+power7 <- function(p, MC = 1000){
+  n <- c(50, 100, 1000)
+  
+  fish_n <- c()
+  chi_n <- c()
+  like_n <- c()
+  for(j in n){
+    fish_i <- c()
+    chi_i <- c()
+    like_i <- c()
+    
+    for(i in 1:MC){
+      bool <- TRUE
+      while(bool){
+        m <- matrix(rmultinom(1, j, p), nrow = 2)
+        x2 <- chisq.test(m)$p.value
+        if(is.nan(x2) == FALSE){
+          bool <- FALSE
+        }
+      }
+      x1 <- fisher.test(m)$p.value < 0.05
+      x2 <- chisq.test(m)$p.value < 0.05
+      x3 <- assocstats(m)[2]$chisq_tests[5] < 0.05
+      fish_i <- append(fish_i, x1)
+      chi_i <- append(chi_i, x2)
+      like_i <- append(like_i, x3)
+    }
+    
+    size_fish <- sum(fish_i[fish_i ==TRUE]) / MC
+    size_chi <- sum(chi_i[chi_i == TRUE]) / MC
+    size_like <- sum(like_i[like_i == TRUE]) / MC
+    
+    fish_n <- append(fish_n, size_fish)
+    chi_n <- append(chi_n, size_chi)
+    like_n <- append(like_n, size_like)
+  }
+  df <- data.frame(fish_n, chi_n, like_n, row.names = c(50, 100, 1000))
+  return(df)
+}
 
+##a
+p_a <- c(1/20, 9/20, 1/20, 9/20)
+power7(p_a)
 
 ##b
-
+p_b <- c(1/40, 19/40, 3/40, 17/40)
+power7(p_b)
 
 # zad 8
 
-gk_manual <- function(df, X1, X2){
-  X1 <- data.frame(as.factor(df$X1))
-  X2 <- data.frame(as.factor(df$X2))
-  tbl <- structable(X1 ~ X2, df)
+# W każdej z poniższych funkcji argument tbl odpowiada za tabelę liczności
+#WAŻNE -> w zadaniu 8 miar zmiennych porządkowych używamy tylko w podpunkcie b
+
+
+# ZMIENNE NOMINALNE
+
+manual_gk_tau <- function(tbl){ #Goodman-Kruskal tau
+  n <- sum(tbl)
   rows <- dim(tbl)[1]
   cols <- dim(tbl)[2]
-  tbl <- matrix(nrow = rows, ncol = cols)
-  n <- sum(tbl)
-  
   tau1 <- 0
   for(row in 1:rows){
     n_i_ <- sum(tbl[row,])
     n_ij2 <- sum(tbl[row,]^2)
-    tau1 <- tau1 + n_ij2 / n*n_i_
+    tau1 <- tau1 + n_ij2 / (n*n_i_)
   }
   
   tau2 <- 0
@@ -108,6 +159,80 @@ gk_manual <- function(df, X1, X2){
     
     tau <- (tau1 - tau2) / (1 - tau2)
   }
-  
-  return(tbl)
+  return(tau)
 }
+
+manual_vc <- function(tbl){ #V-Crammer
+  n <- sum(tbl)
+  rows <- dim(tbl)[1]
+  cols <- dim(tbl)[2]
+  X <- chisq.test(tbl)$statistic
+  v <- sqrt(X / (n*min(rows - 1, cols - 1)))
+  return(v)
+}
+
+manual_tc <- function(tbl){ #T-Czurpova
+  n <- sum(tbl)
+  rows <- dim(tbl)[1]
+  cols <- dim(tbl)[2]
+  X <- chisq.test(tbl)$statistic
+  t <- sqrt(X / (n*sqrt((rows - 1)*(cols - 1))))
+  return(t)
+}
+
+manual_phi <- function(tbl){ #phi
+  n <- sum(tbl)
+  X <- chisq.test(tbl)$statistic
+  phi <- sqrt(X/n)
+  return(phi)
+}
+
+# ZMIENNE PORZĄDKOWE
+
+manual_gk_gamma <- function(tbl){ #Goodman-Kruskal gamma
+  params <- ConDisPairs(tbl)
+  C <- params$C
+  D <- params$D
+  gamma <- (C - D) / (C + D)
+  return(gamma)
+}
+
+manual_kendall_tau_b <- function(tbl){ #tau-b Kendall
+  params <- ConDisPairs(tbl)
+  C <- params$C
+  D <- params$D
+  n <- sum(tbl)
+  rows <- dim(tbl)[1]
+  T1 <- 0
+  for(row in 1:rows){
+    ni <- sum(tbl[row,])
+    T1 <- T1 + ni*(ni - 1) / 2
+  }
+  cols <- dim(tbl)[2]
+  T2 <- 0
+  for(col in 1:cols){
+    nj <- sum(tbl[,col])
+    T2 <- T2 + nj*(nj - 1) / 2
+  }
+  tau <- (C - D) / sqrt((n*(n - 1)/2 - T1)*(n*(n - 1)/2 - T2))
+  return(tau)
+}
+
+manual_sommers_d <- function(tbl){ #d Sommersa
+  params <- ConDisPairs(tbl)
+  C <- params$C
+  D <- params$D
+  n <- sum(tbl)
+  rows <- dim(tbl)[1]
+  T1 <- 0
+  for(row in 1:rows){
+    ni <- sum(tbl[row,])
+    T1 <- T1 + ni*(ni - 1) / 2
+  }
+  d <- (C - D) / (n*(n - 1)/2 - T1)
+  return(d)
+}
+
+
+tt <- GoodmanKruskalTau(x4a, direction = 'column')
+
