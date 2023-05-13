@@ -187,6 +187,13 @@ manual_phi <- function(tbl){ #phi
   return(phi)
 }
 
+manual_c_pearson <- function(tbl){ #c-Pearson
+  n <- sum(tbl)
+  X <- chisq.test(tbl)$statistic
+  c <- sqrt(X/(X +n))
+  return(c)
+}
+
 # ZMIENNE PORZĄDKOWE
 
 manual_gk_gamma <- function(tbl){ #Goodman-Kruskal gamma
@@ -233,6 +240,66 @@ manual_sommers_d <- function(tbl){ #d Sommersa
   return(d)
 }
 
+names_1 <- c('tau_Goodman', 'v_Crammer', 't_Czuprov', 'phi', 'c_Pearson')
+names_2 <- c('gamma_Goodman', 'tau_b_Kendall', 'd_Sommers')
 
-tt <- GoodmanKruskalTau(x4a, direction = 'column')
+##a
+tbl_8a <- structable(W1 ~ S, df) %>% matrix(nrow = 2, ncol = 4)
+manual_8a <- c(manual_gk_tau(tbl_8a),
+               manual_vc(tbl_8a),
+               manual_tc(tbl_8a),
+               manual_phi(tbl_8a),
+               manual_c_pearson(tbl_8a))
+builtin_8a <- c(GoodmanKruskalTau(tbl_8a, direction = 'column'),
+                CramerV(tbl_8a),
+                TschuprowT(tbl_8a),
+                Phi(tbl_8a),
+                ContCoef(tbl_8a))
+results_8a <- data.frame(names_1, manual_8a, builtin_8a)
+colnames(results_8a) <- c('Współczynniki', 'Funkcja własna', 'Funkcja wbudowana')
+results_8a
+
+##b
+tbl_8b <- structable(W1 ~ Wyk, df) %>% matrix(nrow = 3, ncol = 4)
+#zmienne nominalne
+manual_8b_1 <- c(manual_gk_tau(tbl_8b),
+               manual_vc(tbl_8b),
+               manual_tc(tbl_8b),
+               manual_phi(tbl_8b),
+               manual_c_pearson(tbl_8b))
+builtin_8b_1 <- c(GoodmanKruskalTau(tbl_8b, direction = 'column'),
+                CramerV(tbl_8b),
+                TschuprowT(tbl_8b),
+                Phi(tbl_8b),
+                ContCoef(tbl_8b))
+results_8b_1 <- data.frame(names_1, manual_8b_1, builtin_8b_1)
+colnames(results_8b_1) <- c('Współczynniki', 'Funkcja własna', 'Funkcja wbudowana')
+results_8b_1
+
+#zmienne porządkowe
+manual_8b_2 <- c(manual_gk_gamma(tbl_8b),
+                 manual_kendall_tau_b(tbl_8b),
+                 manual_sommers_d(tbl_8b))
+builtin_8b_2 <- c(GoodmanKruskalGamma(tbl_8b),
+                  KendallTauB(tbl_8b),
+                  SomersDelta(tbl_8b, direction = c('row', 'column')))
+results_8b_2 <- data.frame(names_2, manual_8b_2, builtin_8b_2)
+colnames(results_8b_2) <- c('Współczynniki', 'Funkcja własna', 'Funkcja wbudowana')
+results_8b_2
+
+##c
+tbl_8c <- structable(S ~ Wyk, df) %>% matrix(nrow = 3, ncol = 2)
+manual_8c <- c(manual_gk_tau(tbl_8c),
+               manual_vc(tbl_8c),
+               manual_tc(tbl_8c),
+               manual_phi(tbl_8c),
+               manual_c_pearson(tbl_8c))
+builtin_8c <- c(GoodmanKruskalTau(tbl_8c, direction = 'column'),
+                CramerV(tbl_8c),
+                TschuprowT(tbl_8c),
+                Phi(tbl_8c),
+                ContCoef(tbl_8c))
+results_8c <- data.frame(names_1, manual_8c, builtin_8c)
+colnames(results_8c) <- c('Współczynniki', 'Funkcja własna', 'Funkcja wbudowana')
+results_8c
 
