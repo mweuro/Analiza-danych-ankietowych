@@ -85,7 +85,7 @@ test_zad6_2 <- assocstats(x6)
 
 # zad 7 (multinorm)
 
-power7 <- function(p, MC = 1000){
+power7 <- function(p, MC = 10000){
   n <- c(50, 100, 1000)
   
   fish_n <- c()
@@ -132,6 +132,8 @@ power7(p_a)
 ##b
 p_b <- c(1/40, 19/40, 3/40, 17/40)
 power7(p_b)
+
+########################
 
 # zad 8
 
@@ -302,4 +304,35 @@ builtin_8c <- c(GoodmanKruskalTau(tbl_8c, direction = 'column'),
 results_8c <- data.frame(names_1, manual_8c, builtin_8c)
 colnames(results_8c) <- c('Współczynniki', 'Funkcja własna', 'Funkcja wbudowana')
 results_8c
+
+###############################
+
+# zad 9 (Analiza korespondencji zmiennych)
+
+# Zapoznać się z:
+# Funkcjami 'ca' biblioteki 'ca'
+# Funkcją 'Ca' biblioteki 'FactoMineR'
+# Funkcją 'corresp' biblioteki 'MASS'
+
+library(ca)
+library(devtools)
+library(MASS)
+library(FactoMineR)
+
+# zad 10
+
+##a
+tbl_10a <- as.table(structable(W1 ~ S, df))
+ca_a_ca <- ca(tbl_10a, nd = 3)
+ca_a_mass <- corresp(xtabs(~(W1 + S), df), nf = 2)
+
+##b
+tbl_10b <- as.table(structable(W1 ~ Wyk, df))
+ca_b_ca <- ca(tbl_10b)
+ca_b_mass <- corresp(xtabs(~(W1 + Wyk), df), nf = 3)
+
+##c
+tbl_10c <- as.table(structable(S ~ Wyk, df))
+ca_c_ca <- ca(tbl_10c, nd = 3)
+ca_c_mass <- corresp(xtabs(~(S + Wyk), df), nf = 2)
 
