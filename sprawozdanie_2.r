@@ -318,21 +318,37 @@ library(ca)
 library(devtools)
 library(MASS)
 library(FactoMineR)
+library(RColorBrewer)
 
 # zad 10
 
-##a
-tbl_10a <- as.table(structable(W1 ~ S, df))
-ca_a_ca <- ca(tbl_10a, nd = 3)
-ca_a_mass <- corresp(xtabs(~(W1 + S), df), nf = 2)
+kolory <- rev(brewer.pal(11, 'Spectral'))
 
+##a
+tbl_10a <- as.matrix(structable(W1 ~ S, df))
+ca_a_ca <- ca(tbl_10a, nd = 1)
+ca_a_mass <- corresp(xtabs(~(W1 + S), df), nf = 2)
+# Wykres
+biplot(ca_a_mass)
+
+heatmap(tbl_10a, scale = 'col', Colv = NA, col = kolory)
 ##b
-tbl_10b <- as.table(structable(W1 ~ Wyk, df))
+tbl_10b <- as.matrix(structable(W1 ~ Wyk, df))
 ca_b_ca <- ca(tbl_10b)
 ca_b_mass <- corresp(xtabs(~(W1 + Wyk), df), nf = 3)
+# Wykresy
+biplot(ca_b_mass)
+plot(ca_b_ca, mass = c(T, T))
 
 ##c
 tbl_10c <- as.table(structable(S ~ Wyk, df))
 ca_c_ca <- ca(tbl_10c, nd = 3)
 ca_c_mass <- corresp(xtabs(~(S + Wyk), df), nf = 2)
+# Wykres
+biplot(ca_c_mass)
 
+
+
+ca_obj <- ca(haireye, graph = FALSE)
+
+plot.ca()
